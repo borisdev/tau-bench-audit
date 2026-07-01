@@ -159,6 +159,21 @@ The agent never sees this object — it must still infer the requirements throug
 
 The same object is the source for the user-sim prompt, the grader's constraint checks, and the belief-comparison target. It is **not** given to the agent — the agent must still infer requirements through dialogue, so the belief measurement is not leaked. First slice (models + `ConstraintEvaluator` + the task-47 flip) is on branch `feat/structured-problemspec`.
 
+## Where expert elicitation raises grader fidelity
+
+A grader can only check predicates that have been enumerated, and the decisive ones are **tacit** — they live in expert practice, not the written policy. Six bounded, one-time elicitations, each amortized across every trajectory the grader scores:
+
+| Elicit | Raises |
+|---|---|
+| **Invariants** — unwritten rules of competent practice ("don't escalate unprompted") | recall — fewer missed violations |
+| **Action preconditions** — which slots must be resolved before an action | detectability of *acting before the evidence is in* |
+| **Severity weights** — which violations actually matter | relevance, not just internal consistency |
+| **Epistemic bar** — culpable for not resolving ambiguity, or only for defying a stated *no*? | adjudication of borderline cases |
+| **Reference trajectories** — the correct behavior at the failing turn | verdict from *flag* → *counterfactual*; also the supervision signal |
+| **Judge-calibration set** — expert labels, held out | fidelity as a measured judge–expert agreement, not an assertion |
+
+The grader is only as good as the ontology it compiles — and the ontology is precisely the part that isn't written down. Expanded in [`PROBLEM_BELIEF_SPEC.md` §8](PROBLEM_BELIEF_SPEC.md).
+
 ## What about τ²-Bench / dual control?
 
 τ²'s contribution was **dual control** — the user-simulator can also act on the shared world (a parallel axis: *who can act*). This layer is orthogonal — *what the grader can observe* (the agent's belief vs. the problem spec). They compose, but this work does not depend on dual control: the pilot uses the **airline** domain, which is single-control. We fork τ³ for its fixed tasks and structured task schema; the original τ-bench is deprecated.

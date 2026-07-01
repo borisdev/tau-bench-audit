@@ -246,7 +246,62 @@ In short: terminal reward tells you *that* the agent failed; the belief trace te
 
 ---
 
-## 8. Assessment
+## 8. Where expert elicitation raises grader fidelity
+
+The grader is a compiler from an expert ontology into checkable predicates. Its fidelity is
+upper-bounded by the coverage, calibration, and correctness of that ontology — and the ontology
+cannot be read off the written policy, because the load-bearing structure is **tacit**: it lives in
+expert practice, not the manual. Subject-matter-expert (SME) elicitation is the mechanism that
+converts that tacit structure into gradeable form. Six discrete surfaces, each with a measurable
+fidelity effect:
+
+1. **Ontology coverage → the grader's recall ceiling.** A grader can only flag predicates that have
+   been enumerated. "Don't escalate unprompted" is an *invariant of competent practice* that appears
+   nowhere in the τ³ policy as a checkable rule. An expert surfaces these unwritten invariants. The
+   grader's false-negative rate is bounded below by the incompleteness of the invariant set;
+   elicitation lowers that bound. This is the tacit-to-explicit move — the single largest lever on recall.
+
+2. **Action-precondition graph → what makes "acted under `None`" detectable at all.** Severity-by-
+   epistemic-state only works if you know *which slots must be resolved before which actions* (transfer
+   requires `transfer_requested` resolved; cancel requires `refund_eligible ∧ user_accepts_terms`). That
+   mapping is the operational structure of the job — expert knowledge. Without it there is no notion of
+   "a decision that outran the evidence."
+
+3. **Severity / harm model → the grader's decision-relevance.** The `None`/`False`/`True` ladder is
+   structural, but the *weights* — is an unwarranted transfer a minor friction or a trust breach; is an
+   irreversible non-refundable cancellation catastrophic — are elicited priors. Without them the grader is
+   internally precise while optimizing the wrong loss: high agreement on things that don't matter. An
+   expert-elicited harm model is what makes the grader *relevant*, not merely consistent.
+
+4. **Epistemic bar → who adjudicates the ambiguous cases.** Grade against ground truth, or against what
+   was resolvable at decision time? That is not a math question but a domain-policy judgment about
+   culpability — is an agent responsible for proactively resolving ambiguity, or only for defying a stated
+   preference? The SME sets that bar. It is what turns a contestable call into a defensible one, and the
+   difference between a grader annotators agree with and one they argue with.
+
+5. **Reference trajectories → *flag* to *counterfactual*.** When a failure is not prompt-recoverable, the
+   expert authors the correct behavior (the clarifying turn, the calibrated refusal). This does double
+   duty: it makes the verdict concrete ("here is what should have happened at turn 12") and it *is* the
+   supervision signal. The grader stops saying "wrong" and starts specifying "wrong relative to *this*."
+
+6. **Judge calibration → what makes "fidelity" a falsifiable claim.** The belief observer is itself an
+   LLM, and it fabricates (§the verifier caught 3 of 6 findings in the pilot). Fidelity cannot be
+   asserted; it can only be *measured* as agreement between the automated judge and expert labels on a
+   held-out set — and that set is an elicitation deliverable. Without it, "high-fidelity grader" is
+   unfalsifiable; with it, it is a number (judge–SME agreement, per predicate).
+
+The through-line, stated as engineering leverage: **each of these is a bounded, one-time elicitation
+whose output is amortized across every trajectory the grader ever scores.** The expert labels an
+invariant, a precondition, a severity, an epistemic bar, or a held-out set *once*; the grader reuses it
+at scale. Tacit judgment compiled once, applied continuously.
+
+The sharp version: **a grader is only as good as the ontology it compiles, and the ontology is exactly
+the part that isn't written down** — which is why the expert, not further prompt engineering, is the
+binding constraint on grader fidelity.
+
+---
+
+## 9. Assessment
 
 **Meaningful contribution — verified novel against τ³, with one caveat now largely mitigated.**
 
