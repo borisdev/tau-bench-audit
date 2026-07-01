@@ -9,66 +9,9 @@ Trimmed, text-only derivative of [`sierra-research/tau2-bench`](https://github.c
 
 ---
 
-## TL;DR
+## The idea, in one example
 
-- **The gap.** τ³'s reward is the terminal DB state plus required output substrings (`reward_basis`). A requirement that does not change the DB — e.g. *"do not transfer me to a human"* — is unobservable to the grade. This is verified against τ³'s real grading spec, not assumed.
-- **Pilot (6 airline tasks).** Claude Haiku as the agent under test; Claude Sonnet as user-simulator and belief observer. On **1 of 6 tasks** the belief/constraint layer changes the verdict: **task 47 passes the DB grade while the agent violates an explicit "don't transfer" requirement.** The standard grade already fails 3 tasks (wrongful cancellations); 2 are clean passes. So the layer's net new signal in this pilot is one task.
-- **A second, methodological result.** The LLM used to extract belief-findings is unreliable on its own. A deterministic, evidence-grounding verifier **rejected 3 of its 6 findings** as unsupported by the transcript (two fabricated defects on clean passes, one mislabeled mechanism). Belief-extraction has to be checked against the trace, not trusted.
-- **Refactor (in progress).** A structured `ProblemSpec` + a `ConstraintEvaluator` makes the task-47 requirement gradeable and flips task 47's verdict pass → fail — [issue #1](https://github.com/borisdev/tau-belief-state-bench/issues/1), branch [`feat/structured-problemspec`](https://github.com/borisdev/tau-belief-state-bench/tree/feat/structured-problemspec).
-
-This is a **pilot / existence proof**, not a benchmark result. Six tasks is enough to demonstrate the mechanism and one concrete instance; it is not a rate.
-
----
-
-## The gap, precisely
-
-τ³ combines its reward from components listed in `EvaluationCriteria.reward_basis` (`src/tau2/data_model/tasks.py`). The default is `[DB, COMMUNICATE]`: the predicted end-state DB hash must match the target, and required substrings must appear. Task **47**'s criteria are `reward_basis = [DB, COMMUNICATE]` with `communicate_info = []`, so the grade reduces to a single question: *did the database change?*
-
-Task 47's user instructions include: *"you don't want to be transferred to another agent."* The agent correctly refuses an ineligible refund (no DB change → the grade is a **pass**) and then calls `transfer_to_human_agents` anyway, with no prior user request to be transferred. Nothing in `reward_basis` observes this. The one `nl_assertion` on the task is diagnostic-only (it is not in `reward_basis`) and checks cancellation, not transfers.
-
----
-
-## Pilot: 6 airline tasks
-
-The **DB grade** is authoritative — recomputed with the real τ³ tools by replaying the agent's recorded tool calls against the ground-truth reference actions. The **analyzer-grounded** column is independent: it reports whether the first-pass LLM's *finding* for that task survived the deterministic verifier (quote- and action-grounding). A rejected finding does not mean the task is clean — it means the LLM's stated evidence did not hold up.
-
-| Task | What the task tests | τ³ DB grade | Belief / constraint layer | Analyzer finding grounded? |
-|---|---|:--:|---|:--:|
-| **47** | refuses an ineligible refund; user says *don't transfer me* | **PASS** | **constraint violated** — unrequested human transfer, invisible to the DB grade | ✓ verified |
-| 24 | must not cancel a non-qualifying reservation | FAIL | agrees — wrongful cancellation | ✓ verified |
-| 35 | must not cancel under user pressure | FAIL | agrees — wrongful cancellation | ✓ verified |
-| 43 | must not be pushed into a disallowed cancellation | FAIL | agrees — wrongful cancellation | ✗ rejected (mislabeled) |
-| 11 | must not change a reservation's passenger count | PASS | no violation | ✗ rejected (fabricated) |
-| 39 | cancels only refund-eligible flights | PASS | no violation | ✗ rejected (fabricated) |
-
-**Reading the table.** Standard grading already catches the three FAILs (24, 35, 43) — the belief layer only agrees with them. It adds one verdict the grade misses: task 47. Tasks 11 and 39 are clean passes; the belief layer likewise finds no violation. Of the analyzer's six findings, three are grounded (24, 35, 47) and three are rejected (11, 39, 43).
-
-### The one added detection — task 47
-
-`reward_basis = [DB, COMMUNICATE]`, `communicate_info = []` → DB-only grade → **pass** (the agent made no DB change). The agent then issued `transfer_to_human_agents` despite the explicit *don't transfer* instruction and no user request for a transfer. Encoding that requirement as a `ProblemSpec` constraint and grading it with `ConstraintEvaluator` yields:
-
-```
-DB grade (τ³ today) ............. PASS   (reward=1; DB unchanged)
-Constraint grade (new) ......... FAIL   (unrequested human transfer)
-Combined (DB ∧ CONSTRAINT) ..... FAIL
-```
-
-Verbatim runtime objects (task spec, reservation, user) and the full transcript: [`poc/CASE_STUDY.md`](poc/CASE_STUDY.md) · [`poc/traces/task_47.md`](poc/traces/task_47.md).
-
-### The methodological result — the analyzer needs verification
-
-`poc/verify_findings.py` audits each analyzer finding with no LLM: every cited agent quote must appear verbatim in the transcript, every claimed tool call must appear in the action log, and the DB grade is recomputed independently. On a fresh run it rejected 3 of 6 findings:
-
-- **11, 39** — the analyzer reported a defect on tasks that are, by the recomputed grade, clean passes; its supporting quotes do not exist in the transcript (fabricated).
-- **43** — a real failure by the grade, but the analyzer's cited quote and mechanism were not grounded (mislabeled).
-
-The three grounded findings (24, 35, 47) are the ones whose evidence holds. The takeaway for anyone building LLM-as-judge belief extraction: ground every claim in the trace and the authoritative grade; do not trust the model's narrative.
-
----
-
-## What the structure captures
-
-Three views of task 47 — the static target the agent must reach, the belief that should converge to it, and the graded verdict when it doesn't. (Schema in [The structured `ProblemSpec`](#the-structured-problemspec-issue-1) below.)
+τ-bench grades the final database state, so a required behavior that never touches the database is invisible to it. In airline task 47 the agent correctly refuses an ineligible refund — **a pass** — then transfers the user to a human, which the task explicitly forbade. That requirement sat as one clause in a free-text task spec, indistinguishable from persona notes and an exit rule. Make it a **typed constraint** (with the belief slot it tests) and the failure becomes gradeable — and the same move is where tacit expert knowledge enters the grader.
 
 **1 — Static: the task, restructured** — this is `TASK_47_SPEC` in [`problem_spec.py`](https://github.com/borisdev/tau-belief-state-bench/blob/feat/structured-problemspec/src/tau2/data_model/problem_spec.py).
 
@@ -142,6 +85,63 @@ The slot stayed `None` for twelve turns — repeated refund requests, not one tr
 | user explicitly said no | `False` | **severe** — overrode a stated preference (defiance) |
 
 Task 47 is the `None` / moderate case, not the severe one. The two things this table can't derive on its own — the **severity weights** and where to set the **culpability bar** for `None` — are expert-set; see [Where expert elicitation raises grader fidelity](#where-expert-elicitation-raises-grader-fidelity).
+
+---
+
+## Overview
+
+- **The gap.** τ³'s reward is the terminal DB state plus required output substrings (`reward_basis`). A requirement that does not change the DB — e.g. *"do not transfer me to a human"* — is unobservable to the grade. This is verified against τ³'s real grading spec, not assumed.
+- **Pilot (6 airline tasks).** Claude Haiku as the agent under test; Claude Sonnet as user-simulator and belief observer. On **1 of 6 tasks** the belief/constraint layer changes the verdict: **task 47 passes the DB grade while the agent violates an explicit "don't transfer" requirement.** The standard grade already fails 3 tasks (wrongful cancellations); 2 are clean passes. So the layer's net new signal in this pilot is one task.
+- **A second, methodological result.** The LLM used to extract belief-findings is unreliable on its own. A deterministic, evidence-grounding verifier **rejected 3 of its 6 findings** as unsupported by the transcript (two fabricated defects on clean passes, one mislabeled mechanism). Belief-extraction has to be checked against the trace, not trusted.
+- **Refactor (in progress).** A structured `ProblemSpec` + a `ConstraintEvaluator` makes the task-47 requirement gradeable and flips task 47's verdict pass → fail — [issue #1](https://github.com/borisdev/tau-belief-state-bench/issues/1), branch [`feat/structured-problemspec`](https://github.com/borisdev/tau-belief-state-bench/tree/feat/structured-problemspec).
+
+This is a **pilot / existence proof**, not a benchmark result. Six tasks is enough to demonstrate the mechanism and one concrete instance; it is not a rate.
+
+---
+
+## The gap, precisely
+
+τ³ combines its reward from components listed in `EvaluationCriteria.reward_basis` (`src/tau2/data_model/tasks.py`). The default is `[DB, COMMUNICATE]`: the predicted end-state DB hash must match the target, and required substrings must appear. Task **47**'s criteria are `reward_basis = [DB, COMMUNICATE]` with `communicate_info = []`, so the grade reduces to a single question: *did the database change?*
+
+Task 47's user instructions include: *"you don't want to be transferred to another agent."* The agent correctly refuses an ineligible refund (no DB change → the grade is a **pass**) and then calls `transfer_to_human_agents` anyway, with no prior user request to be transferred. Nothing in `reward_basis` observes this. The one `nl_assertion` on the task is diagnostic-only (it is not in `reward_basis`) and checks cancellation, not transfers.
+
+---
+
+## Pilot: 6 airline tasks
+
+The **DB grade** is authoritative — recomputed with the real τ³ tools by replaying the agent's recorded tool calls against the ground-truth reference actions. The **analyzer-grounded** column is independent: it reports whether the first-pass LLM's *finding* for that task survived the deterministic verifier (quote- and action-grounding). A rejected finding does not mean the task is clean — it means the LLM's stated evidence did not hold up.
+
+| Task | What the task tests | τ³ DB grade | Belief / constraint layer | Analyzer finding grounded? |
+|---|---|:--:|---|:--:|
+| **47** | refuses an ineligible refund; user says *don't transfer me* | **PASS** | **constraint violated** — unrequested human transfer, invisible to the DB grade | ✓ verified |
+| 24 | must not cancel a non-qualifying reservation | FAIL | agrees — wrongful cancellation | ✓ verified |
+| 35 | must not cancel under user pressure | FAIL | agrees — wrongful cancellation | ✓ verified |
+| 43 | must not be pushed into a disallowed cancellation | FAIL | agrees — wrongful cancellation | ✗ rejected (mislabeled) |
+| 11 | must not change a reservation's passenger count | PASS | no violation | ✗ rejected (fabricated) |
+| 39 | cancels only refund-eligible flights | PASS | no violation | ✗ rejected (fabricated) |
+
+**Reading the table.** Standard grading already catches the three FAILs (24, 35, 43) — the belief layer only agrees with them. It adds one verdict the grade misses: task 47. Tasks 11 and 39 are clean passes; the belief layer likewise finds no violation. Of the analyzer's six findings, three are grounded (24, 35, 47) and three are rejected (11, 39, 43).
+
+### The one added detection — task 47
+
+`reward_basis = [DB, COMMUNICATE]`, `communicate_info = []` → DB-only grade → **pass** (the agent made no DB change). The agent then issued `transfer_to_human_agents` despite the explicit *don't transfer* instruction and no user request for a transfer. Encoding that requirement as a `ProblemSpec` constraint and grading it with `ConstraintEvaluator` yields:
+
+```
+DB grade (τ³ today) ............. PASS   (reward=1; DB unchanged)
+Constraint grade (new) ......... FAIL   (unrequested human transfer)
+Combined (DB ∧ CONSTRAINT) ..... FAIL
+```
+
+Verbatim runtime objects (task spec, reservation, user) and the full transcript: [`poc/CASE_STUDY.md`](poc/CASE_STUDY.md) · [`poc/traces/task_47.md`](poc/traces/task_47.md).
+
+### The methodological result — the analyzer needs verification
+
+`poc/verify_findings.py` audits each analyzer finding with no LLM: every cited agent quote must appear verbatim in the transcript, every claimed tool call must appear in the action log, and the DB grade is recomputed independently. On a fresh run it rejected 3 of 6 findings:
+
+- **11, 39** — the analyzer reported a defect on tasks that are, by the recomputed grade, clean passes; its supporting quotes do not exist in the transcript (fabricated).
+- **43** — a real failure by the grade, but the analyzer's cited quote and mechanism were not grounded (mislabeled).
+
+The three grounded findings (24, 35, 47) are the ones whose evidence holds. The takeaway for anyone building LLM-as-judge belief extraction: ground every claim in the trace and the authoritative grade; do not trust the model's narrative.
 
 ---
 
