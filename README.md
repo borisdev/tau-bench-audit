@@ -9,8 +9,8 @@ We extend τ³-bench from evaluating only the terminal DB state to also evaluati
 **The abstraction: make ambiguity explicit.** Every requirement becomes a typed slot the belief marks *resolved* or `UNKNOWN`. Where the true `ProblemSpec` fixes a value (`transfer_requested = False`) but the `ProblemSpecBelief` still reads `UNKNOWN`, that gap *is* the ambiguity — and acting while it's open is the bug. Terminal-state grading can't see that; a typed belief can.
 
 **Why it matters for AI quality.**
-- **Better-behaved agents** — they resolve ambiguity before acting, not after. [ProblemSpec vs ProblemSpecBelief →](#problemspec-and-problemspecbelief)
 - **A more precise, deterministic grader** — the next section shows a concrete bug it catches.
+- **Better-behaved agents** — they resolve ambiguity before acting, not after. [ProblemSpec vs ProblemSpecBelief →](#problemspec-and-problemspecbelief)
 - **`ProblemSpec` shape captures expertise** in policy and tacit communication knowledge. [Three concrete examples →](#enriching-the-spec-with-expertise-three-examples)
 
 ---
