@@ -1,4 +1,4 @@
-# tau-same-page-bench
+# τ-same-page-bench
 
 *How well does the agent get on the same page with the user?*
 
@@ -6,18 +6,18 @@
 
 We extend τ³-bench from evaluating only the terminal DB state to also evaluating the **convergence (or divergence) of the agent's `ProblemSpecBelief` toward the user's true `ProblemSpec`** — how well the agent resolves ambiguity, the `UNKNOWN` slots of its belief, by asking the user, before it acts.
 
+**The abstraction: make ambiguity explicit.** Every requirement becomes a typed slot the belief marks *resolved* or `UNKNOWN`. Where the true `ProblemSpec` fixes a value (`transfer_requested = False`) but the `ProblemSpecBelief` still reads `UNKNOWN`, that gap *is* the ambiguity — and acting while it's open is the bug. Terminal-state grading can't see that; a typed belief can.
+
 **Why it matters for AI quality.**
-- **Better-behaved agents.**
+- **Better-behaved agents** — they resolve ambiguity before acting, not after. [ProblemSpec vs ProblemSpecBelief →](#problemspec-and-problemspecbelief)
 - **A more precise, deterministic grader** — the next section shows a concrete bug it catches.
-- **`ProblemSpec` shape captures expertise in policy and tacit communication knowledge.**
+- **`ProblemSpec` shape captures expertise** in policy and tacit communication knowledge. [Three concrete examples →](#enriching-the-spec-with-expertise-three-examples)
 
 ---
 
 ## The τ³-bench grader is wrong on airline task 47
 
 The agent correctly refuses an ineligible refund, then transfers the user to a human — even though the task states *"you don't want to be transferred to another agent."* The grade is `PASS` — a **silent false-pass**: the requirement was one clause buried in the free-text `task_instructions`, so the grader never checks it.
-
-**Why the grade is blind.** τ³'s reward is a product of the components in `EvaluationCriteria.reward_basis` (`src/tau2/data_model/tasks.py`). Task 47's is `[DB, COMMUNICATE]` with `communicate_info = []`, so the grade reduces to one question — *did the database change?* The agent made no DB change, so it scores **PASS**; the unrequested `transfer_to_human_agents` call changes no DB state and appears in no `reward_basis` component, so it is invisible to the grade. (The task's one `nl_assertion` is diagnostic-only — not in `reward_basis` — and checks cancellation, not transfers.)
 
 ## ProblemSpec and ProblemSpecBelief
 
@@ -93,7 +93,7 @@ The **DB grade** is authoritative — recomputed with the real τ³ tools by rep
 
 ### The one added detection — task 47
 
-Encoding task 47's *don't transfer* requirement as a `ProblemSpec` constraint and grading it with `ConstraintEvaluator` flips the verdict the DB-only grade gets wrong:
+Task 47 is graded on `reward_basis = [DB, COMMUNICATE]` with `communicate_info = []` — so the score is just *did the DB change?* No DB change → the transfer is invisible → **PASS**. (The task's lone `nl_assertion` is diagnostic-only — it checks cancellation, not transfers.) Encoding the *don't transfer* requirement as a `ProblemSpec` constraint and grading it with `ConstraintEvaluator` flips the verdict:
 
 ```
 DB grade (τ³ today) ............. PASS   (reward=1; DB unchanged)
