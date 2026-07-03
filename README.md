@@ -4,13 +4,15 @@
 
 **This benchmark.** We extend τ³-bench from grading only the terminal database state to also grading whether the agent got on the same page with the user before acting.
 
-**The behavior.** We study one broad failure pattern: acting without sufficient consent or understanding instead of asking first. τ³-bench uses airline support, but the pattern is general — the same failure occurs when coding, medical, or financial agents act before they understand. For example, in our test run Claude Haiku correctly refuses an ineligible refund, then transfers the user to a human — even though the task says *"you don't want to be transferred to another agent."* τ³-bench scores it **PASS**, despite the agent never establishing common ground about whether the user wanted the transfer. Flagging this pattern is our job.
+**Failure pattern.** We study one broad failure pattern: acting without sufficient consent or understanding instead of asking first. τ³-bench uses airline support, but the pattern is general — the same failure occurs when coding, medical, or financial agents act before they understand.
 
-**The programme.** This work is part of a broader effort in the AI evaluation community to identify recurring failure patterns and target behaviors that can be improved with input from human domain experts.
+**Failure pattern example.** In our test run, Claude Haiku correctly refuses an ineligible refund, then transfers the user to a human — even though the task says *"you don't want to be transferred to another agent."* τ³-bench scores it **PASS**, despite the agent never establishing common ground about whether the user wanted the transfer. Flagging this pattern is our job.
 
-> **Two phases.** This paper delivers **Phase 1** and is built to feed **Phase 2** — keep an eye on the second one; it's where the expert data enters.
-> 1. **Flag — automated, no expert.** An LLM-as-judge structures the latent problem (from τ³ `task_instructions`) and the agent's belief, then flags **epistemic ambiguity**: the agent acting before it resolved what it needed to know.
-> 2. **Fill — targeted expert data.** Only at the flagged spots, a domain expert authors the missing rule as a **PDDL epistemic precondition** — which then drives both **grading** and **gating**.
+**The programme.** This work is part of a broader **two-phase** effort in the AI evaluation community: **Phase 1** identifies recurring failure patterns; **Phase 2** uses them to pinpoint what human domain expertise must be encoded into AI models.
+
+> **Our two phases.**
+> 1. **Flag** — use evals (exploratory data analysis) to flag **bad-action ambiguity**: an agent acting before it resolved what it needed to know.
+> 2. **Resolve** — encode expert **action-precondition rules** (policies) that resolve it, driving both **grading** and **gating**.
 
 ## Key terms
 
