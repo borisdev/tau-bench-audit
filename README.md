@@ -62,18 +62,6 @@ At turn 12 the agent calls `transfer_to_human_agents()` while `transfer_requeste
 
 <sub>The belief is the same shape as the `ProblemSpec` (minus `turn`); the live version also tags each slot with provenance — `status: inferred/assumed`, `evidence_turn` — to separate a resolved fact from a guess.</sub>
 
-### Enriching the spec with expertise (three examples)
-
-These are the **`UNKNOWN`-slot mechanics** made concrete — which slots must be resolved, and what an agent may (or may not) do while one is still `UNKNOWN`. That is exactly where expert knowledge enters; each fix below adds **one piece the written policy doesn't contain**:
-
-| Candidate fix | Why it works | Expert input needed |
-|---|---|---|
-| Default every belief slot to `UNKNOWN`; add a system invariant — *never transfer without an explicit YES*. | The agent can't treat an unresolved slot as consent; escalation now requires positive evidence. | the **invariant** |
-| In the `ProblemSpec`, declare that a `transfer` requires `transfer_requested == True`. | *Acting while `UNKNOWN`* becomes a checkable violation, not a judgment call. | the **action precondition** |
-| Grader penalty when an escalating action fires under `UNKNOWN`. | Turns the belief signal into a reward component the lab can use in eval or training. | the **severity weight** |
-
-Because the `ProblemSpec` is versioned, executable **policy-as-code**, each addition is an auditable record of what *correct* means as policy evolves.
-
 ### SME-authored epistemic preconditions
 
 **Definition.** An *epistemic precondition* is a rule that says **resolve the ambiguity on slot X before taking action Y** — a fact the agent must *know* (its `ProblemSpecBelief` slot resolved, not `UNKNOWN`), not merely a fact that must be *true* in the world. Firing an action while a required slot is still `UNKNOWN` is acting under unresolved ambiguity — the violation.
@@ -108,6 +96,18 @@ The same table has three uses — "one spec, many roles" made concrete:
 | reward signal | training | penalizes acting-while-`UNKNOWN` |
 
 **Systems analogy — three-valued ABAC.** This is attribute-based access control over the belief state, with `ProblemSpecBelief` slots as the attributes. Classic ABAC is two-valued (allow/deny) and assumes every attribute is known; because a slot can be `UNKNOWN`, ours is three-valued — **allow / deny / ask** — and `UNKNOWN` triggers a clarifying question rather than a denial.
+
+### Enriching the spec with expertise (three examples)
+
+These are the **`UNKNOWN`-slot mechanics** made concrete — which slots must be resolved, and what an agent may (or may not) do while one is still `UNKNOWN`. That is exactly where expert knowledge enters; each fix below adds **one piece the written policy doesn't contain**:
+
+| Candidate fix | Why it works | Expert input needed |
+|---|---|---|
+| Default every belief slot to `UNKNOWN`; add a system invariant — *never transfer without an explicit YES*. | The agent can't treat an unresolved slot as consent; escalation now requires positive evidence. | the **invariant** |
+| In the `ProblemSpec`, declare that a `transfer` requires `transfer_requested == True`. | *Acting while `UNKNOWN`* becomes a checkable violation, not a judgment call. | the **action precondition** |
+| Grader penalty when an escalating action fires under `UNKNOWN`. | Turns the belief signal into a reward component the lab can use in eval or training. | the **severity weight** |
+
+Because the `ProblemSpec` is versioned, executable **policy-as-code**, each addition is an auditable record of what *correct* means as policy evolves.
 
 ## Root cause of the false pass: task instructions ↔ grading criteria drift
 
