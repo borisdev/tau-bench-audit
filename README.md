@@ -85,17 +85,7 @@ Each is a `belief.X` guard on the belief state. Violations are **DB-invisible**:
 | 9 | `book_reservation` | `belief.payment_method_authorized == True` | Charges a saved card the user didn't approve for *this* purchase. |
 | 10 | `cancel_reservation` (multi-segment trip) | `belief.cancel_scope == whole_trip` | Cancels the whole itinerary when the user meant one leg — every cancellation looks valid in the DB. |
 
-**Ontic contrast anchor.** `issue_refund ← refund_eligible == True`, and `cancel_reservation` also carries `within_24h ∨ airline_cancelled ∨ insured`. Those are DB-checkable facts — **τ³ already grades them.** Rows 1–10 are the layer it can't see.
-
-The same table has three uses — "one spec, many roles" made concrete:
-
-| Used as… | By whom | Effect |
-|---|---|---|
-| runtime gate | the agent | asks a question instead of acting under ambiguity |
-| grader | the eval | flips task-47 `PASS → FAIL` |
-| reward signal | training | penalizes acting-while-`UNKNOWN` |
-
-**Systems analogy — three-valued ABAC.** This is attribute-based access control over the belief state, with `ProblemSpecBelief` slots as the attributes. Classic ABAC is two-valued (allow/deny) and assumes every attribute is known; because a slot can be `UNKNOWN`, ours is three-valued — **allow / deny / ask** — and `UNKNOWN` triggers a clarifying question rather than a denial.
+→ Why state-grading is blind to these, the grader/runtime/training triple, and the three-valued ABAC framing: [`docs/epistemic-preconditions.md`](docs/epistemic-preconditions.md).
 
 ### Enriching the spec with expertise (three examples)
 
