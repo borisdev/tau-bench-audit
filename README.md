@@ -80,17 +80,26 @@ At turn 12 the agent calls `transfer_to_human_agents()` while `transfer_requeste
 
 Subject-matter experts (SMEs) **hydrate** these offline: for each tool action, *which slots must be grounded, to what value, and how severe if skipped.* That tacit expertise is the part the written policy doesn't contain and a lab can't self-serve. At runtime the agent **consults** them before firing a tool: where a required slot is `UNKNOWN`, it **asks** instead of guessing.
 
-**Theoretical frame — a PDDL action with an epistemic precondition.** Each tool is a [PDDL](https://en.wikipedia.org/wiki/Planning_Domain_Definition_Language) action: name, parameters, **preconditions**, effects. Classic preconditions are *ontic* — facts about the world. Our one extension is the **epistemic precondition**: a fact the agent must *know* (a belief slot resolved, not `UNKNOWN`) before the action fires. Task 47:
+**Theoretical frame — a PDDL action with an epistemic precondition.** Each tool is a [PDDL](https://en.wikipedia.org/wiki/Planning_Domain_Definition_Language) action: name, parameters, **preconditions**, effects. Classic preconditions are *ontic* — facts about the world. Our one extension is the **epistemic precondition**: a fact the agent must *know* (a belief slot resolved, not `UNKNOWN`) before the action fires. Task 47, as a Pydantic model:
 
-```lisp
-(:action transfer-to-human
-  :parameters (?user)
-  :precondition (and (issue-unresolved ?user)          ; ontic — DB-checkable
-                     (knows transfer-requested ?user))  ; EPISTEMIC — belief-only
-  :effect (transferred ?user))
+```python
+class Action(BaseModel):
+    name: str
+    params: list[str]
+    ontic_pre: list[str]      # world facts — τ³ can check these from the DB
+    epistemic_pre: list[str]  # belief slots that must be resolved (not UNKNOWN)
+    effect: str
+
+transfer_to_human = Action(
+    name="transfer_to_human",
+    params=["user"],
+    ontic_pre=["issue_unresolved"],        # DB-checkable
+    epistemic_pre=["transfer_requested"],  # gate: belief.transfer_requested must be resolved
+    effect="transferred",
+)
 ```
 
-The table below is the `(knows …)` slice of each action — the epistemic preconditions τ³'s DB grade can't see. (Related: [PDDL-Mind](https://arxiv.org/abs/2604.17819) makes the belief state explicit in PDDL for theory-of-mind accuracy; we extend belief from a *tracked* quantity to an *action precondition*.)
+The table below is the `epistemic_pre` slice of each action — the epistemic preconditions τ³'s DB grade can't see. (Related: [PDDL-Mind](https://arxiv.org/abs/2604.17819) makes the belief state explicit in PDDL for theory-of-mind accuracy; we extend belief from a *tracked* quantity to an *action precondition*.)
 
 #### Some example epistemic preconditions τ³ can't grade in airline customer service
 
