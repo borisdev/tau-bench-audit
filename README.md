@@ -64,7 +64,7 @@ At turn 12 the agent calls `transfer_to_human_agents()` while `transfer_requeste
 
 ### SME-authored epistemic preconditions
 
-**Definition.** An *epistemic precondition* is a rule that says **resolve the ambiguity on slot X before taking action Y** — a fact the agent must *know* (its `ProblemSpecBelief` slot resolved, not `UNKNOWN`), not merely a fact that must be *true* in the world. Firing an action while a required slot is still `UNKNOWN` is acting under unresolved ambiguity — the violation.
+**Definition.** *Epistemic* means **about what the agent knows** — as opposed to *ontic*, about what is **true in the world**. So an *epistemic precondition* is a rule that says **resolve the ambiguity on slot X before taking action Y** — a fact the agent must *know* (its `ProblemSpecBelief` slot resolved, not `UNKNOWN`), not merely a fact that must be *true*. Firing an action while a required slot is still `UNKNOWN` is acting under unresolved ambiguity — the violation.
 
 Subject-matter experts (SMEs) **hydrate** these offline: for each tool action, *which slots must be grounded, to what value, and how severe if skipped.* That tacit expertise is the part the written policy doesn't contain and a lab can't self-serve. At runtime the agent **consults** them before firing a tool: where a required slot is `UNKNOWN`, it **asks** instead of guessing.
 
