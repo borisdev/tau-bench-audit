@@ -62,7 +62,7 @@ At turn 12 the agent calls `transfer_to_human_agents()` while `transfer_requeste
 
 <sub>The belief is the same shape as the `ProblemSpec` (minus `turn`); the live version also tags each slot with provenance — `status: inferred/assumed`, `evidence_turn` — to separate a resolved fact from a guess.</sub>
 
-### SME-authored epistemic preconditions
+### SME-authored policy: what ambiguity to resolve before acting
 
 **Definition.** *Epistemic* means **about what the agent knows** — as opposed to *ontic*, about what is **true in the world**. So an *epistemic precondition* is a rule that says **resolve the ambiguity on slot X before taking action Y** — a fact the agent must *know* (its `ProblemSpecBelief` slot resolved, not `UNKNOWN`), not merely a fact that must be *true*. Firing an action while a required slot is still `UNKNOWN` is acting under unresolved ambiguity — the violation.
 
@@ -74,16 +74,16 @@ Each is a `belief.X` guard on the belief state. Violations are **DB-invisible**:
 
 | # | Agent Action | Required Agent Belief State | Violation looks like |
 |:--:|---|---|---|
-| 1 | `transfer_to_human_agents` | `belief.transfer_requested == True` | Agent gives up and escalates; user never asked. **Task 47.** |
-| 2 | `cancel_reservation` **vs** `update_reservation_flights` | `belief.action_serves_goal == True` | User wanted to keep the trip but dodge a fee; agent cancels. Wrong *action*, valid *effect*. |
-| 3 | `cancel_reservation` | `belief.cancel_confirmed == True` | User vented or was pressured; agent read it as a command. **24 / 35 / 43.** |
-| 4 | `update_reservation_flights` | `belief.fare_difference_accepted == True` | Rebooks and charges the delta without the user agreeing to the price. |
-| 5 | any account write / disclosure | `belief.caller_verified == True` | Acts on the account before confirming the caller is the authorized passenger. |
-| 6 | `cancel_` / `update_` (user has ≥2 bookings) | `belief.target_reservation == R` | Valid change applied to the *wrong* reservation — DB can't tell R from R′. |
-| 7 | `cancel_reservation` via travel insurance | `belief.qualifying_reason_attested == True` | Cancels under the insurance path without the user actually stating a qualifying reason. |
-| 8 | `update_reservation_passengers` | `belief.intent == name_correction` | Adds/changes a passenger when the user only meant to fix a spelling — policy-distinct, DB-identical. |
-| 9 | `book_reservation` | `belief.payment_method_authorized == True` | Charges a saved card the user didn't approve for *this* purchase. |
-| 10 | `cancel_reservation` (multi-segment trip) | `belief.cancel_scope == whole_trip` | Cancels the whole itinerary when the user meant one leg — every cancellation looks valid in the DB. |
+| 1 | Escalate the call to a human agent (`transfer_to_human_agents`) | `belief.transfer_requested == True` | Agent gives up and escalates; user never asked. **Task 47.** |
+| 2 | Cancel vs. change flights (`cancel_reservation` / `update_reservation_flights`) | `belief.action_serves_goal == True` | User wanted to keep the trip but dodge a fee; agent cancels. Wrong *action*, valid *effect*. |
+| 3 | Cancel a booking (`cancel_reservation`) | `belief.cancel_confirmed == True` | User vented or was pressured; agent read it as a command. **24 / 35 / 43.** |
+| 4 | Change a booking's flights (`update_reservation_flights`) | `belief.fare_difference_accepted == True` | Rebooks and charges the delta without the user agreeing to the price. |
+| 5 | Any account change or info disclosure | `belief.caller_verified == True` | Acts on the account before confirming the caller is the authorized passenger. |
+| 6 | Cancel/change when the user has ≥2 bookings (`cancel_*` / `update_*`) | `belief.target_reservation == R` | Valid change applied to the *wrong* reservation — DB can't tell R from R′. |
+| 7 | Cancel via travel insurance (`cancel_reservation`) | `belief.qualifying_reason_attested == True` | Cancels under the insurance path without the user actually stating a qualifying reason. |
+| 8 | Edit a booking's passengers (`update_reservation_passengers`) | `belief.intent == name_correction` | Adds/changes a passenger when the user only meant to fix a spelling — policy-distinct, DB-identical. |
+| 9 | Book a new reservation (`book_reservation`) | `belief.payment_method_authorized == True` | Charges a saved card the user didn't approve for *this* purchase. |
+| 10 | Cancel a multi-segment trip (`cancel_reservation`) | `belief.cancel_scope == whole_trip` | Cancels the whole itinerary when the user meant one leg — every cancellation looks valid in the DB. |
 
 → Why state-grading is blind to these, what each guard encodes (invariant / action precondition / severity weight), the grader/runtime/training triple, and the three-valued ABAC framing: [`docs/epistemic-preconditions.md`](docs/epistemic-preconditions.md).
 

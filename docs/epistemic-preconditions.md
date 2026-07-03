@@ -1,6 +1,6 @@
 # Epistemic preconditions — systems framing
 
-Background for the **SME-authored epistemic preconditions** in the [README](../README.md#sme-authored-epistemic-preconditions). The README carries the definition and the airline example table; this doc carries the framing: why state-grading is blind to these, what the same artifact buys you, and the systems analogy.
+Background for the **SME-authored policy** ([README](../README.md#sme-authored-policy-what-ambiguity-to-resolve-before-acting)) — the epistemic preconditions on what ambiguity must be resolved before an agent acts. The README carries the definition and the airline example table; this doc carries the framing: why state-grading is blind to these, what the same artifact buys you, and the systems analogy.
 
 ## Ontic vs epistemic — why τ³ is blind by construction
 
