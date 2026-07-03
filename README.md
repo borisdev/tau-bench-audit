@@ -8,6 +8,8 @@ We extend τ³-bench from evaluating only the terminal DB state to also evaluati
 
 We define **ambiguity** as the gap between the true `ProblemSpec` and the agent's `ProblemSpecBelief` — [the two typed representations below](#problemspec-and-problemspecbelief).
 
+> The goal is not zero ambiguity — it's a sufficient problem specification. Some slots can stay `UNKNOWN` if they don't bear on the action.
+
 **Why it matters for AI quality.**
 - **A more precise, deterministic grader** — the next section shows a real bug it catches on a live τ³ airline task.
 - **Better-behaved agents** — when a required `ProblemSpecBelief` slot is `UNKNOWN`, the AI agent asks rather than acting on a guess. [ProblemSpec vs ProblemSpecBelief →](#problemspec-and-problemspecbelief)
