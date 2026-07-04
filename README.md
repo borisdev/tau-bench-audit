@@ -12,11 +12,11 @@
 
 **What AI builders need.** Rules specifying what an agent must *sufficiently* understand about the user's state of mind — the part the pending action depends on — before acting.
 
-**Our objective.** Flag these failures, then convert each into an expert-authored rule. A broader effort in the AI evaluation community — two phases we deliver, a third the AI builder does:
+**Our objective.** A high-level plan in three phases, where Phases 2 and 3 depend on Phase 1 — the work in this paper.
 
-> 1. **Flag — the grader's blind spot.** Evals surface where the outcome grader is ignorant of the user's mental model: it passes an action even though an epistemic requirement went unmet. Detection only.
-> 2. **Resolve — author the rules.** Human subject-matter experts write explicit **action-precondition rules** that shape the `ProblemSpec` / `ProblemSpecBelief` — defining *what the agent must know* before an action, so ambiguity now **has a chance** to be resolved. Output: a grader that can finally score the epistemic requirement (**grading**).
-> 3. **Build — reduce ambiguity at runtime.** Only now can AI builders add agent mechanisms to actually reduce it: ask a clarifying question, **gate** the action until the belief is resolved.
+> 1. **Flag** *(this paper)* — use evals to surface where the agent is ignorant of the user's problem.
+> 2. **Resolve** — turn each ignorance pattern into a human-authored **action-precondition rule** the grader can score.
+> 3. **Build** *(AI builder)* — use those rules to **gate** the agent, shrinking the gap between its belief of the user's problem and the actual problem.
 >
 > Two concrete examples (Phases 1–2):
 > - **Unrequested transfer (task 47).** *Flag:* the agent transfers the user to a human; the grader sees an unchanged DB and passes it — though the task said *"don't transfer."* *Resolve:* an SME adds `transfer_to_human` requires `belief.transfer_requested == True`, and it now grades **FAIL**.
