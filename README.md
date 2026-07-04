@@ -2,21 +2,18 @@
 
 *Does the agent establish sufficient common ground — enough shared understanding — before acting?*
 
-## TL;DR
+## Motivation
 
-- **The failure.** AI agents sometimes act before resolving what they need to know — acting without common ground — producing unwanted actions that outcome graders were never told to check for: their criteria only cover database-checkable outcomes, not the unstructured user-problem constraints inside the `task_instructions`.
-- **What AI builders need.** Expert-authored rules specifying what an agent must *sufficiently* understand about the user's state of mind — the part relevant to the pending action — before taking it.
-- **This paper's objective.** Analyze recurring failure patterns, identify the unresolved knowledge behind each bad action, and convert that gap into a focused question for domain experts to answer.
+**This benchmark.** We extend τ³-bench from grading only the terminal database state to also grading whether the agent reached common ground before acting. τ³'s setting is airline support, but the pattern is general — coding, medical, and financial agents fail the same way.
 
-## Overview
+**Failure pattern.** AI agents sometimes act before they understand — without common ground — producing unwanted actions that outcome graders were never told to check for.
 
-**AI benchmark.** We extend τ³-bench from grading only the terminal database state to also grading whether the agent got on the same page with the user before acting. τ³-bench uses airline support, but the pattern is general — the same failure occurs when coding, medical, or financial agents act before they understand.
+**Failure pattern example.** Claude Haiku refuses an ineligible refund, then transfers the user to a human — though the task said *"you don't want to be transferred to another agent."* τ³-bench scores it **PASS**: the *don't-transfer* requirement lives only in free-text `task_instructions`, never in the grader's structured criteria. A **silent false-pass**. ([root cause →](#root-cause-of-the-false-pass-task-instructions--grading-criteria-drift))
 
-**Example.** In our test run, Claude Haiku correctly refuses an ineligible refund, then transfers the user to a human — even though the task says *"you don't want to be transferred to another agent."* τ³-bench scores it **PASS**, despite the agent never establishing common ground about whether the user wanted the transfer. This is a **silent false-pass**: the *don't-transfer* requirement lives only in the free-text `task_instructions`, not in the structured criteria the grader checks. ([root cause →](#root-cause-of-the-false-pass-task-instructions--grading-criteria-drift))
+**What AI builders need.** Rules specifying what an agent must *sufficiently* understand about the user's state of mind — the part the pending action depends on — before acting.
 
-**Research programme.** This work is part of a broader effort in the AI evaluation community: use **failure-pattern analysis** to find where an agent needs human domain expertise, encode that expertise as explicit rules, and only then build agents that can act on it.
+**Our objective.** Flag these failures, then convert each into an expert-authored rule. A broader effort in the AI evaluation community — two phases we deliver, a third the AI builder does:
 
-> **Three phases — we deliver 1–2; the AI builder does 3:**
 > 1. **Flag — the grader's blind spot.** Evals surface where the outcome grader is ignorant of the user's mental model: it passes an action even though an epistemic requirement went unmet. Detection only.
 > 2. **Resolve — author the rules.** Human subject-matter experts write explicit **action-precondition rules** that shape the `ProblemSpec` / `ProblemSpecBelief` — defining *what the agent must know* before an action, so ambiguity now **has a chance** to be resolved. Output: a grader that can finally score the epistemic requirement (**grading**).
 > 3. **Build — reduce ambiguity at runtime.** Only now can AI builders add agent mechanisms to actually reduce it: ask a clarifying question, **gate** the action until the belief is resolved.
