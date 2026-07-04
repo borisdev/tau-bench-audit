@@ -17,10 +17,8 @@
 A three-phase plan; Phase 1 — this paper — unblocks Phases 2 and 3.
 
 > 1. **Flag Ignorance** *(this paper)* — use evals to surface where the agent is ignorant of the user's problem.
-> 2. **Resolve Ignorance** *(Human Subject Matter Expert)* — turn each ignorance pattern into an **action-precondition rule** the grader can score. Two examples of this expert knowledge:
->    - `transfer_to_human` requires `belief.transfer_requested == True` — the agent must *know the user asked* before escalating (task 47).
->    - `cancel_reservation` requires `belief.cancel_confirmed == True` — the agent must *confirm intent*, not act on venting (*"this is ridiculous"*).
-> 3. **Preflight Check** *(AI builder)* — turn each rule into the agent's pre-action gate: when a required belief is `UNKNOWN`, **halt and ask** before firing — closing the gap between the agent's belief and the user's actual requirements. ([example checklist →](docs/preflight-checklist-example.md))
+> 2. **Resolve Ignorance** *(Human Subject Matter Expert)* — turn each ignorance pattern into an **action-precondition rule** the grader can score.
+> 3. **Preflight Check** *(AI builder)* — turn each rule into the agent's pre-action gate: when a required belief is `UNKNOWN`, **halt and ask** before firing. ([example checklist →](docs/preflight-checklist-example.md))
 
 ## Glossary
 
