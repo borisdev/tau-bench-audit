@@ -2,7 +2,7 @@
 
 ## Purpose
 
-> **Note — implementation simplified since this handoff.** Instead of a `StructuredUserInstructionsV2` wrapper class, we add one optional `user_preflight_requirements: StructuredUserRequirements | None = None` field directly to τ³'s own `StructuredUserInstructions` (see README + [issue #1](https://github.com/borisdev/tau-preflight-check-bench/issues/1)). The rest of this document is the historical spec, kept as written.
+> **Note — implementation simplified since this handoff.** Instead of a `StructuredUserInstructionsV2` wrapper class, we add one optional `user_preflight_requirements: UserPreflightRequirements | None = None` field directly to τ³'s own `StructuredUserInstructions` (see README + [issue #1](https://github.com/borisdev/tau-preflight-check-bench/issues/1)). The rest of this document is the historical spec, kept as written.
 
 Refactor the current `ProblemSpec` work into a smaller, cleaner experiment that stays close to τ³-bench.
 
@@ -119,7 +119,7 @@ class StructuredUserInstructionsV2(BaseModel):
     task_instructions: str
 
     # New typed representation used by the new grader.
-    structured_requirements: StructuredUserRequirements
+    structured_requirements: UserPreflightRequirements
 
     # Optional typed simulator-only controls, if useful for the pilot.
     simulator_policy: SimulatorPolicy | None = None
@@ -162,7 +162,7 @@ class ConditionalAuthorization(BaseModel):
     condition: str
 
 
-class StructuredUserRequirements(BaseModel):
+class UserPreflightRequirements(BaseModel):
     goal: str | None = None
 
     preferences: list[str] = Field(default_factory=list)
@@ -252,7 +252,7 @@ TASK_47_INSTRUCTIONS_V2 = StructuredUserInstructionsV2(
     # Preserve exactly.
     task_instructions=ORIGINAL_TASK_INSTRUCTIONS,
 
-    structured_requirements=StructuredUserRequirements(
+    structured_requirements=UserPreflightRequirements(
         goal="obtain a full refund",
 
         authorizations={
@@ -649,7 +649,7 @@ or another name consistent with the repository.
 Include:
 
 - `StructuredUserInstructionsV2`;
-- `StructuredUserRequirements`;
+- `UserPreflightRequirements`;
 - authorization/consent types;
 - task-local constraint type;
 - optional simulator-policy type;
@@ -776,7 +776,7 @@ Use these terms consistently in the pilot:
 
 The same user-simulator input plus a typed representation of action-relevant requirements.
 
-### `StructuredUserRequirements`
+### `UserPreflightRequirements`
 
 The typed task-local requirements derived only from the existing τ³ scenario.
 

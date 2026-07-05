@@ -1,7 +1,7 @@
 """Preflight-requirements fixtures for the paired re-scoring pilot.
 
 Each fixture builder loads the *real* τ³ scenario from the shipped task data and attaches a
-typed `StructuredUserRequirements` to it via the optional `user_preflight_requirements`
+typed `UserPreflightRequirements` to it via the optional `user_preflight_requirements`
 field, so `task_instructions` (and every other scenario field) is preserved byte-for-byte by
 construction (not retyped by hand). Only `user_preflight_requirements` is added, and every
 constraint's `source_quote` is a verbatim substring of the real task prose (assert this with
@@ -20,7 +20,7 @@ from tau2.data_model.structured_requirements import (
     ConditionalAuthorization,
     ConsentStatus,
     SimulatorPolicy,
-    StructuredUserRequirements,
+    UserPreflightRequirements,
     TaskConstraint,
     verify_provenance,
 )
@@ -55,7 +55,7 @@ def build_task_47() -> StructuredUserInstructions:
     """
     v1 = _load_airline_task_instructions("47")
 
-    requirements = StructuredUserRequirements(
+    requirements = UserPreflightRequirements(
         goal="obtain a full refund for the flight",
         preferences=[
             "be persistent and don't provide more information than necessary",

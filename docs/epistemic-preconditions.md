@@ -30,10 +30,10 @@ A single row is not one fact; it decomposes into three pieces the written policy
 | Candidate fix | Why it works | Expert input needed |
 |---|---|---|
 | Default every belief slot to `UNKNOWN`; add a system invariant — *never transfer without an explicit YES*. | The agent can't treat an unresolved slot as consent; escalation now requires positive evidence. | the **invariant** |
-| In `StructuredUserRequirements`, declare that a `transfer` requires `transfer_requested == True`. | *Acting while `UNKNOWN`* becomes a checkable violation, not a judgment call. | the **action precondition** |
+| In `UserPreflightRequirements`, declare that a `transfer` requires `transfer_requested == True`. | *Acting while `UNKNOWN`* becomes a checkable violation, not a judgment call. | the **action precondition** |
 | Grader penalty when an escalating action fires under `UNKNOWN`. | Lets the eval weight how severe the violation is. | the **severity** |
 
-Because `StructuredUserRequirements` is versioned, executable **policy-as-code** (every constraint carries a `source_quote`), each addition is an auditable record of what *correct* means as policy evolves. (This *invariant / action-precondition / severity* decomposition is **Design by Contract** — Meyer's `require`/`ensure`/`invariant` — applied per tool; the **severity** weight is the FMEA severity. Prior art: [`FRAMING.md`](../FRAMING.md).)
+Because `UserPreflightRequirements` is versioned, executable **policy-as-code** (every constraint carries a `source_quote`), each addition is an auditable record of what *correct* means as policy evolves. (This *invariant / action-precondition / severity* decomposition is **Design by Contract** — Meyer's `require`/`ensure`/`invariant` — applied per tool; the **severity** weight is the FMEA severity. Prior art: [`FRAMING.md`](../FRAMING.md).)
 
 ## Systems analogy — three-valued ABAC
 

@@ -8,7 +8,7 @@ has no predicate for most of those requirements, so a stated requirement like "d
 transfer me" is *revealed to the simulator but missed by the grader* (task 47's silent
 false-pass).
 
-This module holds the typed, checkable representation (`StructuredUserRequirements`) that a
+This module holds the typed, checkable representation (`UserPreflightRequirements`) that a
 *second* grader reads. It is attached to τ³'s own `StructuredUserInstructions` via the
 optional `user_preflight_requirements` field, so the simulator prose (`task_instructions`)
 stays byte-for-byte unchanged and every existing task still loads. Re-scoring the same
@@ -21,7 +21,7 @@ requirement carries provenance (`source_field` + `source_quote`) that must be a 
 substring of the referenced source field — see `verify_provenance`.
 
 Import discipline: this module MUST NOT import from `tasks.py` (that would create a circular
-import — `tasks.py` imports `StructuredUserRequirements` from here). `verify_provenance`
+import — `tasks.py` imports `UserPreflightRequirements` from here). `verify_provenance`
 therefore duck-types the instructions object rather than importing its class.
 
 Dependency-light on purpose (pydantic only) so it imports and tests without the harness.
@@ -88,7 +88,7 @@ class SimulatorPolicy(BaseModel):
     end_after_persistence_limit: bool = False
 
 
-class StructuredUserRequirements(BaseModel):
+class UserPreflightRequirements(BaseModel):
     """The typed, task-local requirements derived only from the existing τ³ scenario.
 
     - `goal`         — the user's objective (prose is fine; not itself a gradeable predicate).

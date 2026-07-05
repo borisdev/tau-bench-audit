@@ -4,7 +4,7 @@ Moved out of the README to keep the main page approachable.
 
 ## The one added detection — task 47
 
-Task 47 is graded on `reward_basis = [DB, COMMUNICATE]` with `communicate_info = []` — so the score is just *did the DB change?* No DB change → the transfer is invisible → **PASS**. (The task's lone `nl_assertion` is diagnostic-only — it checks cancellation, not transfers.) Lifting the *don't transfer* requirement into a typed `StructuredUserRequirements` constraint and grading it with `StructuredRequirementsEvaluator` flips the verdict:
+Task 47 is graded on `reward_basis = [DB, COMMUNICATE]` with `communicate_info = []` — so the score is just *did the DB change?* No DB change → the transfer is invisible → **PASS**. (The task's lone `nl_assertion` is diagnostic-only — it checks cancellation, not transfers.) Lifting the *don't transfer* requirement into a typed `UserPreflightRequirements` constraint and grading it with `StructuredRequirementsEvaluator` flips the verdict:
 
 ```
 DB grade (τ³ today) ................ PASS   (reward=1; DB unchanged)
@@ -25,4 +25,4 @@ The three grounded findings (24, 35, 47) are the ones whose evidence holds. For 
 
 ## Root cause: task_instructions ↔ grading criteria drift
 
-`task_instructions` and `evaluation_criteria` are separate hand-authored artifacts, so they drift — task 47 is where the scenario forbids the transfer but the graded criteria don't. A single typed requirement spec — `StructuredUserRequirements`, carried in the optional `user_preflight_requirements` field on τ³'s `StructuredUserInstructions` — compiled to both the simulator prompt and the grader closes the drift by construction: the two views derive from one source and cannot disagree. Design detail (and the deferred agent-belief-tracking layer): [`PROBLEM_BELIEF_SPEC.md`](../PROBLEM_BELIEF_SPEC.md).
+`task_instructions` and `evaluation_criteria` are separate hand-authored artifacts, so they drift — task 47 is where the scenario forbids the transfer but the graded criteria don't. A single typed requirement spec — `UserPreflightRequirements`, carried in the optional `user_preflight_requirements` field on τ³'s `StructuredUserInstructions` — compiled to both the simulator prompt and the grader closes the drift by construction: the two views derive from one source and cannot disagree. Design detail (and the deferred agent-belief-tracking layer): [`PROBLEM_BELIEF_SPEC.md`](../PROBLEM_BELIEF_SPEC.md).

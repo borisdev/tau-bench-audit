@@ -22,7 +22,7 @@ from tau2.data_model.fixtures_preflight import build_task_47, get_preflight_fixt
 from tau2.data_model.structured_requirements import (
     ConditionalAuthorization,
     ConsentStatus,
-    StructuredUserRequirements,
+    UserPreflightRequirements,
     TaskConstraint,
     verify_provenance,
 )
@@ -197,7 +197,7 @@ def test_evaluate_instructions_skips_when_no_requirements():
 
 
 def test_denied_authorization_grades_generic_requirements():
-    reqs = StructuredUserRequirements(
+    reqs = UserPreflightRequirements(
         authorizations={"charge_payment": ConsentStatus.DENIED},
         constraints=[
             TaskConstraint(

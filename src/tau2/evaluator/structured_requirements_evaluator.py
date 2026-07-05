@@ -1,7 +1,7 @@
 """StructuredRequirementsEvaluator — the deterministic V2 grader.
 
 Given a recorded trajectory (the poc/trajectories.json shape: a list of role/text/tool_calls
-dicts) and a `StructuredUserRequirements`, it reports human-readable violations of the
+dicts) and a `UserPreflightRequirements`, it reports human-readable violations of the
 *task-local* requirements, each linked to action / turn / rule-id / source_field / source_quote.
 
 It is deterministic (no LLM) and grades only requirements already recoverable from τ³'s own
@@ -26,7 +26,7 @@ from pydantic import BaseModel
 from tau2.data_model.structured_requirements import (
     ConditionalAuthorization,
     ConsentStatus,
-    StructuredUserRequirements,
+    UserPreflightRequirements,
     TaskConstraint,
 )
 from tau2.evaluator.constraint_evaluator import _all_tool_calls
@@ -158,7 +158,7 @@ class StructuredRequirementsEvaluator:
     def evaluate(
         self,
         trajectory: list[dict],
-        requirements: StructuredUserRequirements,
+        requirements: UserPreflightRequirements,
     ) -> StructuredGradeResult:
         all_violations: list[StructuredRequirementViolation] = []
         honored = 0
