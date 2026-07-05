@@ -14,4 +14,4 @@ This repo is a **trimmed, text-only PoC fork** of τ³-bench
 All `src/` code is intact (incl. voice modules, unused here). To pull upstream
 fixes: `git fetch upstream && git checkout upstream/main -- <path>`.
 
-See `PROBLEM_BELIEF_SPEC.md` for the AgentProblemSpec / belief-convergence design.
+See `PROBLEM_BELIEF_SPEC.md` for the deferred agent-belief-tracking design (the current pilot is paired re-scoring — see `README.md` and `docs/claude-code-handoff-structured-user-instructions-v2.md`).
