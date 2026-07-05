@@ -4,7 +4,7 @@
 
 ## Motivation
 
-**A worked failure.** We ran Claude Haiku on τ³ airline task 47 and hit *two* failures at once. The agent correctly refused an ineligible refund, then **transferred the user to a human anyway — without confirming they wanted it** (it skipped a preflight check on a stated preference — *"you don't want to be transferred to another agent"*). And **τ³ scored it PASS**: its grade checks only the final database state, and the transfer changed nothing there — so the user's *don't-transfer* request never enters the grade. That request lives in the task's prose (τ³'s `task_instructions` field), not in the database facts the grader scores — the **red** line below:
+**A worked failure.** We ran Claude Haiku on τ³ airline task 47 and hit *two* failures at once. The agent correctly refused an ineligible refund, then **transferred the user to a human anyway — without confirming they wanted it** — skipping a preflight check on a stated user requirement, shown in red below:
 
 ```diff
 {
@@ -18,9 +18,13 @@
 }
 ```
 
-**Below, *The patch* shows how we attack that.**
+For task 47, **τ³ scored it PASS even though the agent did not honor that stated requirement**: its grade checks only the final database state, and the transfer changed nothing there — so the *don't-transfer* request never enters the grade. It lives in the task's prose (τ³'s `task_instructions` field), not in the database facts the grader scores. **Below, *The patch* shows how we attack that.**
 
-**What we grade.** τ-PreflightCheck extends τ³ to catch this pattern — an agent disregarding the user's personal requirements or preconditions on an action. The analogy is medical: an AI that *effectively* fixes the user's problem can still cause harm through the **side effects** of its actions, and **each user tolerates different side effects**. τ³ grades whether the agent solved the problem; we grade whether it **respected the user's limits while doing so** — i.e., whether it ran an action preflight check before committing. **Scope:** this release grades whether the agent honored the user's *stated* constraints on how an action is done (task 47's *don't-transfer*) — not task completion (τ³'s job), and not probing the *unknown* requirements the user never stated (the deferred belief-tracking phase).
+**What we grade.** τ-PreflightCheck extends τ³ to catch this pattern — an agent disregarding the user's personal requirements or preconditions on an action. The analogy is medical: an AI that *effectively* fixes the user's problem can still cause harm through the **side effects** of its actions, and **each user tolerates different side effects**. τ³ grades whether the agent solved the problem; we grade whether it **respected the user's limits while doing so** — i.e., whether it ran an action preflight check before committing.
+
+## Scope
+
+This release grades whether the agent honored the user's **stated** constraints on *how* an action is done (task 47's *don't-transfer*) — **not** task completion (τ³'s job), and **not** probing the *unknown* requirements the user never stated (the deferred belief-tracking phase).
 
 <details>
 <summary><b>Glossary</b> — key terms, sequenced by dependency (click to expand)</summary>
