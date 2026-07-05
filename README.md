@@ -61,7 +61,7 @@ Deeper theory and full prior art (POMDP belief states, assistance games, epistem
 
 ## The patch: make the implicit requirement explicit
 
-τ-PreflightCheck is a **surgical patch** to τ³: one optional field, plus a grader that reads it. The entire schema change to τ³'s own `StructuredUserInstructions` —
+τ-PreflightCheck adds one optional field to τ³'s `StructuredUserInstructions`, plus a grader that reads it. The schema change:
 
 ```diff
   # src/tau2/data_model/tasks.py
@@ -71,9 +71,9 @@ Deeper theory and full prior art (POMDP belief states, assistance games, epistem
 +     user_preflight_requirements: StructuredUserRequirements | None = None   # NEW — typed, grader-visible
 ```
 
-Optional (`default None`) → every existing τ³ task still loads, and the simulator prose stays byte-for-byte. Two more files complete the surface: a leaf module [`structured_requirements.py`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/data_model/structured_requirements.py) (the types) and [`StructuredRequirementsEvaluator`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/evaluator/structured_requirements_evaluator.py) (reads the field). The rest is the worked case — **task 47** — watching the *same* requirement move from implicit prose to the explicit field:
+The field is optional (`default None`), so existing tasks are unaffected and the simulator prose is unchanged. Two supporting files: [`structured_requirements.py`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/data_model/structured_requirements.py) (the types) and [`StructuredRequirementsEvaluator`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/evaluator/structured_requirements_evaluator.py) (reads the field). Worked example — task 47:
 
-**Implicit — buried in prose.** Task 47's `task_instructions`, verbatim ([source ↗](https://github.com/borisdev/tau-preflight-check-bench/blob/591a7a5474666b90634eb9b1ec51371b889bc1db/data/tau2/domains/airline/tasks.json#L3408-L3416)). The **red** line is a stated requirement τ³'s criteria never check — effectively **deleted** from what's graded:
+**Implicit.** Task 47's `task_instructions`, verbatim ([source ↗](https://github.com/borisdev/tau-preflight-check-bench/blob/591a7a5474666b90634eb9b1ec51371b889bc1db/data/tau2/domains/airline/tasks.json#L3408-L3416)). The **red** line is a stated requirement that is not in τ³'s graded criteria:
 
 ```diff
 {
@@ -87,7 +87,7 @@ Optional (`default None`) → every existing τ³ task still loads, and the simu
 }
 ```
 
-**Explicit — we populate the new field** for task 47: the same requirement, typed, with the *correct* semantics and provenance (each rule traces to its `source_quote` — the red line above):
+**Explicit.** Populate the field for task 47 — the same requirement, typed, with correct semantics and provenance (each rule cites its `source_quote`, the red line above):
 
 ```diff
 + StructuredUserRequirements(
@@ -109,7 +109,7 @@ Optional (`default None`) → every existing τ³ task still loads, and the simu
 
 Two semantics a looser encoding gets wrong: **`ConsentStatus.DENIED`** means the user *explicitly refused* — not merely that no transfer was requested; and cancellation is a **conditional** authorization — the *world* decides whether `full_refund_available` holds, so `refund_eligible` is a world fact, not the user's requirement. Every requirement carries a `source_quote`, so we can prove we **made an existing stated rule gradeable, not invented one.**
 
-**The result reads like a test going red on a real bug** — same trajectory, two graders. Adding the optional field changes nothing the agent sees or the simulator says, so any verdict difference is **what the grader can represent, not a changed conversation**:
+**Result.** The same recorded trajectory, scored by both graders. Adding the field changes nothing the agent or simulator sees, so any verdict difference is grader representation, not a changed conversation:
 
 ```text
 same task · same simulator prose · same trajectory · same agent output
