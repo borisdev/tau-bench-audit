@@ -22,7 +22,7 @@ We ran Claude Haiku on τ³-bench airline task 47 and flag an **in-spirit failur
 
 ## Medical side-effects analogy
 
-Like a medical treatment, an AI agent can *effectively* solve the user's problem yet still harm them through the **side effects** of its actions — and **each user tolerates different side effects** (task 47: an unwanted transfer). τ³ grades effectiveness — *did it solve the problem?* We grade the user's limits on those side effects — *did it run a preflight check before acting?*
+Like a medical doctor treating a patient, an AI agent can *effectively* solve the customer's problem yet still harm them through the **side effects** of its actions — and **each customer tolerates different side effects** (task 47: an unwanted transfer). τ³ grades effectiveness — *did it solve the problem?* We grade the customer's limits on those side effects — *did it run a preflight check before acting?*
 
 ## Scope
 
