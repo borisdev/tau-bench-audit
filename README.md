@@ -134,21 +134,6 @@ To illustrate, synthetic SME protocols answering *what must a customer-service a
 
 Design + full prior art: [`PROBLEM_BELIEF_SPEC.md`](PROBLEM_BELIEF_SPEC.md) · [`FRAMING.md`](FRAMING.md).
 
-## Method
-
-| Stage | File | What it does |
-|---|---|---|
-| Run | [`poc/run_airline.py`](poc/run_airline.py) | Haiku agent vs. Sonnet user-sim on the real τ³ airline tools + policy; records the trajectory and recomputes the DB grade. |
-| Extract | [`poc/analyze_beliefs.py`](poc/analyze_beliefs.py) | Sonnet observer proposes candidate violated-requirement findings + cited evidence (first-pass, unverified — an extraction heuristic, *not* the deferred belief-state layer). |
-| Verify | [`poc/verify_findings.py`](poc/verify_findings.py) | Deterministic quote/action grounding + independent grade recompute; rejects ungrounded findings. |
-| Preflight-requirements grade | `PreflightRequirementsEvaluator` — [`src/…/preflight_requirements_evaluator.py`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/evaluator/preflight_requirements_evaluator.py) | Grades a trajectory against the task's `UserPreflightRequirements` (typed constraints with source-quote provenance). |
-
-Data artifacts: [`poc/trajectories.json`](poc/trajectories.json), [`poc/verified_findings.json`](poc/verified_findings.json), readable transcripts in [`poc/traces/`](poc/traces/).
-
-Reproduce: `run_airline.py` → `analyze_beliefs.py` → `verify_findings.py`.
-
-Each rule's `action` is a **canonical τ³ tool name**, matched against the trajectory's actual tool calls (the user's own phrasing lives in `source_quote`). Scaling the analysis therefore starts from enumerating τ³'s **consequential-tool surface** — the finite set of actions a preflight rule can guard.
-
 ## FAQ
 
 <details>
@@ -235,6 +220,21 @@ Where it lands instead: a global invariant like *"under uncertainty, default to 
 - DB grades are recomputed against τ³'s real `reward_basis`; the task-47 pass is verified against that spec.
 - The pilot grades outright `DENIED` refusals only; conditional (world-state) authorizations — permit an action only if a policy predicate holds — are future work.
 </details>
+
+## Method
+
+| Stage | File | What it does |
+|---|---|---|
+| Run | [`poc/run_airline.py`](poc/run_airline.py) | Haiku agent vs. Sonnet user-sim on the real τ³ airline tools + policy; records the trajectory and recomputes the DB grade. |
+| Extract | [`poc/analyze_beliefs.py`](poc/analyze_beliefs.py) | Sonnet observer proposes candidate violated-requirement findings + cited evidence (first-pass, unverified — an extraction heuristic, *not* the deferred belief-state layer). |
+| Verify | [`poc/verify_findings.py`](poc/verify_findings.py) | Deterministic quote/action grounding + independent grade recompute; rejects ungrounded findings. |
+| Preflight-requirements grade | `PreflightRequirementsEvaluator` — [`src/…/preflight_requirements_evaluator.py`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/evaluator/preflight_requirements_evaluator.py) | Grades a trajectory against the task's `UserPreflightRequirements` (typed constraints with source-quote provenance). |
+
+Data artifacts: [`poc/trajectories.json`](poc/trajectories.json), [`poc/verified_findings.json`](poc/verified_findings.json), readable transcripts in [`poc/traces/`](poc/traces/).
+
+Reproduce: `run_airline.py` → `analyze_beliefs.py` → `verify_findings.py`.
+
+Each rule's `action` is a **canonical τ³ tool name**, matched against the trajectory's actual tool calls (the user's own phrasing lives in `source_quote`). Scaling the analysis therefore starts from enumerating τ³'s **consequential-tool surface** — the finite set of actions a preflight rule can guard.
 
 ## Repository map
 
