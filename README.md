@@ -20,7 +20,9 @@
 
 For task 47, **τ³ scored it PASS even though the agent did not honor that stated requirement**: its grade checks only the final database state, and the transfer changed nothing there — so the *don't-transfer* request never enters the grade. It lives in the task's prose (τ³'s `task_instructions` field), not in the database facts the grader scores. **Below, *The patch* shows how we attack that.**
 
-**What we grade.** τ-PreflightCheck extends τ³ to catch this pattern — an agent disregarding the user's personal requirements or preconditions on an action. The analogy is medical: an AI that *effectively* fixes the user's problem can still cause harm through the **side effects** of its actions, and **each user tolerates different side effects**. τ³ grades whether the agent solved the problem; we grade whether it **respected the user's limits while doing so** — i.e., whether it ran an action preflight check before committing.
+## Medical side-effects analogy
+
+Like a medical treatment, an AI agent can *effectively* solve the user's problem yet still harm them through the **side effects** of its actions — and **each user tolerates different side effects** (task 47: an unwanted transfer). τ³ grades effectiveness — *did it solve the problem?* We grade the user's limits on those side effects — *did it run a preflight check before acting?*
 
 ## Scope
 
