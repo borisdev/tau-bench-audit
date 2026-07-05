@@ -103,7 +103,7 @@ The field is optional (`default None`), so existing tasks are unaffected and the
 +   ])
 ```
 
-Two semantics a looser encoding gets wrong: **`ConsentStatus.DENIED`** means the user *explicitly refused* — not merely that no transfer was requested; and cancellation is a **conditional** authorization — the *world* decides whether `full_refund_available` holds, so `refund_eligible` is a world fact, not the user's requirement. Every requirement carries a `source_quote`, so we can prove we **made an existing stated rule gradeable, not invented one.**
+Every rule carries a `source_quote` (the red line above) — the requirement is **lifted from the task, not invented**.
 
 **Result.** The same recorded trajectory, scored by both graders. Adding the field changes nothing the agent or simulator sees, so any verdict difference is grader representation, not a changed conversation:
 
@@ -115,9 +115,7 @@ same task · same simulator prose · same trajectory · same agent output
 
 Full flip mechanics + independent verification: [`docs/pilot-details.md`](docs/pilot-details.md).
 
-<sub>Agent-side belief tracking — does the agent *resolve* each requirement before acting? — is a later phase; the paired re-scoring experiment needs only the grader's view, not the agent's belief.</sub>
-
-→ **The epistemic precondition in depth** — the *ontic* vs *epistemic* definition, the SME hydration model, and the PDDL / Pydantic action frame — is in [`docs/epistemic-preconditions.md`](docs/epistemic-preconditions.md), kept off this page so a first-time reader meets the basics first.
+Epistemic precondition in depth (ontic vs epistemic, SME hydration, the PDDL / Pydantic action frame): [`docs/epistemic-preconditions.md`](docs/epistemic-preconditions.md).
 
 
 ## Method
