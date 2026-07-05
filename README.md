@@ -125,12 +125,14 @@ Reproduce: `run_airline.py` → `analyze_beliefs.py` → `verify_findings.py`.
 
 ---
 
-## What this sets up: belief tracking
+## What this sets up: eliciting SME expertise and belief tracking
 
-Today the grader compares the agent's actions to `UserPreflightRequirements` (the target). The next layer is **`UserPreflightRequirementsBelief`** — per-turn tracking of whether the agent *resolves* each requirement (each slot `KNOWN` / `UNKNOWN`) before it acts, scored against the same target. The target already exists as the comparison anchor; belief tracking overlays it. ("Belief state" is the term of art in dialogue-state tracking — Young et al. 2013.)
+Both directions build on the same `UserPreflightRequirements` target.
 
-Recent work points at this gap:
-- **Deng et al. 2026** ([arXiv:2606.03135](https://arxiv.org/abs/2606.03135)) rewards clarifying questions by information gain, but names our exact target as *future work*: App. 6.5 flags the case where "clarification resolves ambiguity but execution violates policy," motivating "jointly optimizing clarification and execution." That clarify-succeeds-yet-action-violates case is what a precondition grader scores.
+**Eliciting SME expertise** — the *should-exist but omitted* half. Task 47's rule was at least stated in the prose; most real-world protocol rules aren't in any task. Where a requirement is only implicit — or missing — is exactly where to **elicit a domain expert** and turn the answer into a typed constraint, building a reusable `PreflightPolicyPack`. Phase-1 flagging shows *which* actions need it most. Harm-anchored elicitation pipeline: [`docs/design-notes-what-to-establish.md`](docs/design-notes-what-to-establish.md); illustrative pack: [`docs/preflight-checklist-example.md`](docs/preflight-checklist-example.md).
+
+**Belief tracking** — `UserPreflightRequirementsBelief`. Per-turn tracking of whether the agent *resolves* each requirement (each slot `KNOWN` / `UNKNOWN`) before acting, scored against the same target. ("Belief state" is the term of art in dialogue-state tracking — Young et al. 2013.) Recent work points at this gap:
+- **Deng et al. 2026** ([arXiv:2606.03135](https://arxiv.org/abs/2606.03135)) rewards clarifying questions by information gain, but names our exact target as *future work*: App. 6.5 flags the case where "clarification resolves ambiguity but execution violates policy," motivating "jointly optimizing clarification and execution."
 - **PDDL-Mind** ([arXiv:2604.17819](https://arxiv.org/abs/2604.17819)) makes belief explicit as a *tracked* quantity; we extend belief from tracked → an *action precondition*.
 - **Intent-governed authorization** ([arXiv:2606.22916](https://arxiv.org/abs/2606.22916)) gates tool authority by *expressed* intent; belief tracking targets *latent* intent — inferred and verified, not declared.
 
