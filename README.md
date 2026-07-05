@@ -57,19 +57,9 @@ Deeper theory and full prior art (POMDP belief states, assistance games, epistem
 
 Our eval innovation: we **instrument the unobservable** — the user's latent problem and the agent's current belief — as two comparable typed objects, and treat the **gap between them as the failure signal**. That gap flags exactly where **targeted expert data** most improves AI quality.
 
-τ-PreflightCheck adds one optional field to τ³'s `StructuredUserInstructions`, plus a grader that reads it. The schema change:
+### Existing in τ³ — implicit, in prose
 
-```diff
-  # src/tau2/data_model/tasks.py
-  class StructuredUserInstructions(BaseModel):
-      ...
-      task_instructions: str            # the user's requirements — buried in prose, grader-invisible
-+     user_preflight_requirements: UserPreflightRequirements | None = None   # NEW — typed, grader-visible
-```
-
-The field is optional (`default None`), so existing tasks are unaffected and the simulator prose is unchanged. Two supporting files: [`structured_requirements.py`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/data_model/structured_requirements.py) (the types) and [`StructuredRequirementsEvaluator`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/evaluator/structured_requirements_evaluator.py) (reads the field). Worked example — task 47:
-
-**Implicit.** Task 47's `task_instructions`, verbatim ([source ↗](https://github.com/borisdev/tau-preflight-check-bench/blob/591a7a5474666b90634eb9b1ec51371b889bc1db/data/tau2/domains/airline/tasks.json#L3408-L3416)). The **red** line is a stated requirement that is not in τ³'s graded criteria:
+τ³ keeps the user's requirements in one prose field, `task_instructions`, and grades only a structured subset of the scenario — so a requirement left in prose is invisible to grading. Task 47's `task_instructions`, verbatim ([source ↗](https://github.com/borisdev/tau-preflight-check-bench/blob/591a7a5474666b90634eb9b1ec51371b889bc1db/data/tau2/domains/airline/tasks.json#L3408-L3416)). The **red** line is a stated requirement that is not in τ³'s graded criteria:
 
 ```diff
 {
@@ -83,7 +73,19 @@ The field is optional (`default None`), so existing tasks are unaffected and the
 }
 ```
 
-**Explicit.** Populate the field for task 47 — the same requirement, typed, with correct semantics and provenance (each rule cites its `source_quote`, the red line above):
+### Added — explicit, as `UserPreflightRequirements`
+
+We add one optional field to τ³'s own `StructuredUserInstructions` (no wrapper class), plus a grader that reads it. The schema change:
+
+```diff
+  # src/tau2/data_model/tasks.py
+  class StructuredUserInstructions(BaseModel):
+      ...
+      task_instructions: str            # the user's requirements — buried in prose, grader-invisible
++     user_preflight_requirements: UserPreflightRequirements | None = None   # NEW — typed, grader-visible
+```
+
+The field is optional (`default None`), so existing tasks are unaffected and the prose is unchanged. Two supporting files: [`structured_requirements.py`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/data_model/structured_requirements.py) (the types) and [`StructuredRequirementsEvaluator`](https://github.com/borisdev/tau-preflight-check-bench/blob/main/src/tau2/evaluator/structured_requirements_evaluator.py) (reads the field). Populate it for task 47 — the same requirement, typed, with provenance (each rule cites its `source_quote`, the red line above):
 
 ```diff
 + UserPreflightRequirements(
