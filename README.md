@@ -4,7 +4,7 @@
 
 ## Motivation
 
-We ran Claude Haiku on τ³ airline task 47 and hit *two* failures at once. The agent correctly refused an ineligible refund, then **transferred the user to a human anyway — without confirming they wanted it** — skipping a preflight check on a stated user requirement, shown in red below:
+We ran Claude Haiku on τ³ airline task 47 and flag an **in-spirit failure in τ³'s grader**. Although the agent resolved the problem, it **mistakenly transferred the user to a human** — skipping a preflight check on a stated user requirement, shown in red below:
 
 ```diff
 {
