@@ -4,7 +4,7 @@
 
 ## Motivation
 
-**A worked failure.** We ran Claude Haiku on τ³ airline task 47 and hit *two* failures at once. The agent correctly refused an ineligible refund, then **transferred the user to a human anyway — without confirming they wanted it** (it skipped a preflight check on a stated preference). And **τ³ scored it PASS**: the transfer left the database unchanged, and the user's *don't-transfer* requirement sits in free-text `task_instructions`, not in the grader's criteria. The overlooked requirement is the red line:
+**A worked failure.** We ran Claude Haiku on τ³ airline task 47 and hit *two* failures at once. The agent correctly refused an ineligible refund, then **transferred the user to a human anyway — without confirming they wanted it** (it skipped a preflight check on a stated preference — *"you don't want to be transferred to another agent"*). And **τ³ scored it PASS**: the transfer left the database unchanged, and the user's *don't-transfer* requirement sits in free-text `task_instructions`, not in the grader's criteria. The overlooked requirement is the red line:
 
 ```diff
 {
