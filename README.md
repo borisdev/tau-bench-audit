@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/borisdev/tau-preflight-check-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/borisdev/tau-preflight-check-bench/actions/workflows/ci.yml)
 
-*Can an AI agent do the one thing the user told it not to — and still pass the benchmark?*
+*τ³ grades whether an agent reaches the goal. τ-PreflightCheck adds a second question: did it respect how the user wanted it done?*
 
 ## Motivation
 
