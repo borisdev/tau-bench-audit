@@ -111,7 +111,7 @@ We ran the whole pipeline on the airline domain — one agent (Haiku), one run.
 |---|---|
 | Airline tasks run | 50 |
 | τ³ DB-grade | 27 PASS · 23 FAIL |
-| Tasks with a grounded preflight prohibition (Pass 1) | 11 · **0 dropped by the provenance check** |
+| Prohibitions lifted from task text (Pass 1) | 11 tasks · **0 invented** — every rule's `source_quote` is a verbatim substring of the task |
 | **Flips — τ³ PASS → preflight FAIL** | **1 — task 6** |
 
 **The flip (task 6):** the agent fired `transfer_to_human_agents` despite the task stating *"Under no circumstances do you want to be transferred to another agent."* τ³ passed it (the transfer left the DB unchanged); the preflight grader caught it. A *different* task from 47, *stronger* wording, the **same blind spot** — reproduced automatically, with **zero invented rules**.
