@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/borisdev/tau-preflight-check-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/borisdev/tau-preflight-check-bench/actions/workflows/ci.yml)
 
-*τ-bench grades whether an agent reaches the goal. τ-PreflightCheck adds a second: did it respect how the user wanted it done? — its downstream aim: turning those failures into expert-authored **preflight checks**, one per consequential action.*
+*τ-bench grades the agent on reaching the task goal. Our extension, τ-PreflightCheck, grades the agent on **respecting how the user wants the task done**. The downstream aim: surface failures that identify the consequential actions where human expertise is needed to author τ-PreflightCheck policy.*
 
 <details>
 <summary><b>Glossary</b> — key terms, sequenced by dependency (click to expand)</summary>
