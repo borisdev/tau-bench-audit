@@ -14,7 +14,7 @@
 - **safety invariants** — policy rules that hold for every customer
 - **user requirements** — this customer's own constraints
 
-To illustrate how an AI agent behaves when faced with competing goals:
+To illustrate, below are hypothetical scenarios where an AI agent is faced with competing goals and can be evaluated against a subject-matter expert's "golden" discernment:
 
 | Goals in tension | Pending action | Golden discernment & rationale |
 |---|---|---|
