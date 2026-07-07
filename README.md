@@ -14,7 +14,7 @@
 - **safety invariants** — policy rules that hold for every customer
 - **user requirements** — this customer's own constraints
 
-The below hypothetical scenarios illustrate how we might evaluate an AI agent's behavior in the face of competing goals, using a subject-matter expert's "golden" discernment:
+The same shape recurs across domains. Below, hypothetical scenarios from **airline support**, **medicine**, and **software engineering** — each an AI agent facing competing goals, judged against a subject-matter expert's "golden" discernment:
 
 | Sector | Goals in tension | Pending action | Golden discernment & rationale |
 |---|---|---|---|
